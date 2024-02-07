@@ -168,6 +168,27 @@ func (c *CommClient) VideoGetInfo(aid int64) (*VideoInfo, error) {
 	return info, nil
 }
 
+// VideoGetBVInfo 返回视频详细信息，数据较多，可以使用单独的接口获取部分数据
+//
+// 限制游客访问的视频会返回错误，请使用 BiliClient 发起请求
+func (c *CommClient) VideoGetBVInfo(bvid string) (*VideoInfo, error) {
+	resp, err := c.RawParse(BiliApiURL,
+		"x/web-interface/view",
+		"GET",
+		map[string]string{
+			"bvid": bvid,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	var info *VideoInfo
+	if err = json.Unmarshal(resp.Data, &info); err != nil {
+		return nil, err
+	}
+	return info, nil
+}
+
 // VideoGetDescription
 //
 // 获取稿件简介
@@ -1332,7 +1353,6 @@ func (c *CommClient) CommentGetMain(oid int64, tp int, mode int, next int, ps in
 }
 
 // CommentGetReply 获取指定评论和二级回复
-//
 //
 // oid: 对应类型的ID
 //
